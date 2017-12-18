@@ -7,19 +7,27 @@ from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 
 note_names = ["E", "F", "G", "A", "B", "C", "D"]
 
-def check_keystroke(title_input):
+def check_keystroke(title_input, melody):
 	keystroke = ""
-	melody = []
-	while keystroke != "Print":
+	fill_measures = False
+	while keystroke != "Print" and not fill_measures:
 		keystroke = raw_input("Enter a note(A, C, F, etc): ")
    		if keystroke in note_names:
    			for i in range(0, len(note_names)):
    				if note_names[i] == keystroke:
-   					melody.append(i / 2)
+   					melody.append(i / 2.0)
+   		elif keystroke != "Print":
+   			print 'Please either enter a note or enter "Print"'
    		elif keystroke == "Print":
-   			make_graph(melody, title_input)
-    	else:
-    		print 'Please either enter a note or enter "Print"'
+   			if len(melody) % 4 != 0:
+   				print """
+\nYour melody does not evenly fill your measures.
+Please add more notes.\n
+"""
+				check_keystroke(title_input, melody)
+			else:
+				fill_measures = True
+				make_graph(melody, title_input)
 
 def make_graph(melody, title_input):
     plots = []
@@ -99,7 +107,8 @@ def make_graph(melody, title_input):
     plotly.offline.plot(fig, filename='notation')
 
 def notate_melody():
+	melody = []
 	title_input = raw_input("Please enter a title for the piece: ")
-	check_keystroke(title_input)
+	check_keystroke(title_input, melody)
 
 notate_melody()
